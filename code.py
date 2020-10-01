@@ -13,17 +13,11 @@ session = driver.session()
 # session = driver.session()
 
 
-for q in ["DROP INDEX ON :Company(companyId)",
-			"DROP INDEX ON :GUO(guoId)",
-			"DROP INDEX ON :Director(directorId)",
-			"DROP INDEX ON :Address(addId)"]:
-	session.run(q)
-
 session.run("MATCH (n) DETACH DELETE n")
 
 
 cypher_query = """
-USING PERIODIC COMMIT 10000
+USING PERIODIC COMMIT 1000
 LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/jgarciab/neo4j_test/main/n_dirs.csv' AS row
 CREATE (d:Director {directorId: row.dir_id, directorName: row.dir_name, RTO:row.rto_level})
 """
@@ -33,7 +27,7 @@ session.run(cypher_query)
 print("Query 1 completed")
 
 cypher_query = """
-USING PERIODIC COMMIT 10000
+USING PERIODIC COMMIT 1000
 LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/jgarciab/neo4j_test/main/n_comps.csv' AS row
 CREATE (c:Company {companyId: row.bvd_id, companyName: row.company_name, nace: row.nace, legal:row.legal})
 """
@@ -43,7 +37,7 @@ session.run(cypher_query)
 print("Query 2 completed")
 
 cypher_query = """
-USING PERIODIC COMMIT 10000
+USING PERIODIC COMMIT 1000
 LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/jgarciab/neo4j_test/main/n_adds.csv' AS row
 CREATE (a:Address {addId: row.company_adddress, addName:row.add_full, perc_RTO:toInteger(row.add_off)})
 """
@@ -53,7 +47,7 @@ session.run(cypher_query)
 print("Query 3 completed")
 
 cypher_query = """
-USING PERIODIC COMMIT 10000
+USING PERIODIC COMMIT 1000
 LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/jgarciab/neo4j_test/main/n_guos.csv' AS row
 CREATE (g:GUO {guoId: row.guo})
 """
@@ -64,18 +58,16 @@ print("Query 4 completed")
 
 
 
-
-for q in ["CREATE CONSTRAINT compID ON (n:Company) ASSERT n.companyId IS UNIQUE",
-		"CREATE CONSTRAINT guoID ON (n:GUO) ASSERT n.guoId IS UNIQUE",
-		"CREATE CONSTRAINT dirID ON (n:Director) ASSERT n.directorId IS UNIQUE",
-		"CREATE CONSTRAINT addID ON (n:Address) ASSERT n.addId IS UNIQUE"]:
-
+for q in ["CREATE INDEX ON :Company(companyId)",
+			"CREATE INDEX ON :GUO(guoId)",
+			"CREATE INDEX ON :Director(directorId)",
+			"CREATE INDEX ON :Address(addId)"]:
 	session.run(q)
 
 print("Index completed")
 
 cypher_query = """
-USING PERIODIC COMMIT 10000
+USING PERIODIC COMMIT 1000
 LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/jgarciab/neo4j_test/main/r_dirs.csv' AS row
 MATCH (c:Company {companyId: row.bvd_id})
 WITH c,row
@@ -88,7 +80,7 @@ session.run(cypher_query)
 print("Query 5 completed")
 
 cypher_query = """
-USING PERIODIC COMMIT 10000
+USING PERIODIC COMMIT 1000
 LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/jgarciab/neo4j_test/main/r_adds.csv' AS row
 MATCH (c:Company {companyId: row.bvd_id})
 with c,row
@@ -101,7 +93,7 @@ session.run(cypher_query)
 print("Query 6 completed")
 
 cypher_query = """
-USING PERIODIC COMMIT 10000
+USING PERIODIC COMMIT 1000
 LOAD CSV WITH HEADERS FROM 'https://raw.githubusercontent.com/jgarciab/neo4j_test/main/r_guos.csv' AS row
 MATCH (c:Company {companyId: row.bvd_id})
 with c,row
@@ -135,18 +127,6 @@ for q in ["CREATE INDEX ON :Company(companyName)","CREATE INDEX ON :Director(dir
 	session.run(q)
 
 
-for q in ["REMOVE CONSTRAINT compID ON (n:Company) ASSERT n.companyId IS UNIQUE",
-		"REMOVE CONSTRAINT guoID ON (n:GUO) ASSERT n.guoId IS UNIQUE",
-		"REMOVE CONSTRAINT dirID ON (n:Director) ASSERT n.directorId IS UNIQUE",
-		"REMOVE CONSTRAINT addID ON (n:Address) ASSERT n.addId IS UNIQUE"]:
-
-	session.run(q)
-
-for q in ["CREATE INDEX ON :Company(companyId)",
-			"CREATE INDEX ON :GUO(guoId)",
-			"CREATE INDEX ON :Director(directorId)",
-			"CREATE INDEX ON :Address(addId)"]:
-	session.run(q)
 
 print("QIndex completed")
 
