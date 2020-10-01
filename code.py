@@ -3,8 +3,8 @@
 from neo4j import GraphDatabase, basic_auth
 
 driver = GraphDatabase.driver(
-    "bolt://18.209.225.51:33099", 
-    auth=basic_auth("neo4j", "varactors-dives-twirls"))
+    "bolt://100.26.250.215:33019", 
+    auth=basic_auth("neo4j", "radius-kits-currencies"))
 session = driver.session()
 
 # driver = GraphDatabase.driver(
